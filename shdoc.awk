@@ -2,13 +2,19 @@
 
 BEGIN { verbatim = 0 }
 
-/^#!/ { next }
+NR == 1 && /^#!/ {
+    shebang_line = $0; next
+}
 
 /^\s*$/ { print; next }
 
 !/^\s*#/ {
+    if (shebang_line) {
+        print "```{.numberLines startFrom='1'}\n" shebang_line "\n```"
+        shebang_line = ""
+    }
     if (!verbatim) {
-        print "```{ .numberLines startFrom='" NR "'}"
+        print "```{.numberLines startFrom='" NR "'}"
         verbatim = 1
     }
     print
